@@ -1,0 +1,26 @@
+{
+  "name": "golden-sentence",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zouhangwithsweet/golden-sentence.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zouhangwithsweet/golden-sentence/issues"
+  },
+  "homepage": "https://github.com/zouhangwithsweet/golden-sentence#readme",
+  "dependencies": {
+    "postcss": "^7.0.32",
+    "postcss-pxtorem": "^5.1.1"
+  }
+}

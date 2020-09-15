@@ -1,0 +1,50 @@
+{
+  "name": "Bad Request",
+  "version": "0.1",
+  "description": "Bad Request",
+  "permissions": [
+    "activeTab",
+    "declarativeContent",
+    "storage",
+    "webRequest",
+    "webRequestBlocking",
+    "*://localhost:*/*",
+    "*://manhattan.webapp.xiaojukeji.com/hebe/*",
+    "*://manhattan.webapp.xiaojukeji.com/zeus/*",
+    "*://manhattan.webapp.xiaojukeji.com/hera/*",
+    "*://raven.xiaojukeji.com/*",
+    "*://omgup.xiaojukeji.com/*",
+    "*://omgup1.xiaojukeji.com/*",
+    "*://omgup2.xiaojukeji.com/*",
+    "*://omgup3.xiaojukeji.com/*"
+  ],
+  "background": {
+    "page": "page.html",
+    "persistent": true
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://localhost:*/*",
+        "*://manhattan.webapp.xiaojukeji.com/hebe/*",
+        "*://manhattan.webapp.xiaojukeji.com/zeus/*",
+        "*://manhattan.webapp.xiaojukeji.com/hera/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "browser_action": {
+    "default_title": "say",
+    "default_icon": "images/batman.png",
+    "default_popup": "popup.html"
+  },
+  "icons": {
+    "16": "images/batman.png",
+    "32": "images/batman.png",
+    "48": "images/batman.png",
+    "128": "images/batman.png"
+  },
+  "manifest_version": 2
+}
