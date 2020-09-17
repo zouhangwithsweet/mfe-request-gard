@@ -1,6 +1,6 @@
 let ravenBlocking = false
 let omegaBlocking = false
-let apiBlocking = true
+let apiBlocking = false
 
 const APIS = [
   'contract/reserveTemplate',
@@ -27,6 +27,10 @@ const APIS = [
   '/loan/apply',
   '/repayment/create-repay'
 ]
+
+chrome.storage.sync.set({ MFE_API: APIS }, function () {
+  console.log('API 设置成功')
+})
 
 chrome.storage.onChanged.addListener(function (changes) {
   for (key in changes) {
@@ -95,7 +99,7 @@ ${api.slice(api.indexOf("/api"))}
 }
 
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-  if (tab.url && tab.url.includes('localhost:') && tab.status === 'complete') {
+  if (tab.url && tab.status === 'complete') {
     const dataR = await getStorage('ravenBlocking')
     ravenBlocking = dataR.ravenBlocking
 
@@ -110,7 +114,6 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
     handlerRequest,
     {
       urls: [
-        "*://localhost:*/*",
         "*://manhattan.webapp.xiaojukeji.com/hebe/*",
         "*://manhattan.webapp.xiaojukeji.com/zeus/*",
         "*://manhattan.webapp.xiaojukeji.com/hera/*",
@@ -123,4 +126,17 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
     },
     ["blocking", "requestBody", "extraHeaders"]
   )
+})
+
+chrome.runtime.onInstalled.addListener(function(){
+	chrome.declarativeContent.onPageChanged.removeRules(undefined, function(){
+		chrome.declarativeContent.onPageChanged.addRules([
+			{
+				conditions: [
+					new chrome.declarativeContent.PageStateMatcher({pageUrl: {urlContains: 'manhattan.webapp.xiaojukeji.com'}})
+				],
+				actions: [new chrome.declarativeContent.ShowPageAction()]
+			}
+		])
+	})
 })

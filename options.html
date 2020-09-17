@@ -1,25 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="font-size: 50px;">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
+  <link rel="stylesheet" href="./lib/mand-rem.css">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-size: .32rem;
+    }
     button {
       height: 30px;
       width: 30px;
       outline: none;
-      margin: 10px;
+    }
+    .content {
+      margin: 0 auto;
+      width: 750px;
+    }
+    .md-detail-title {
+      font-size: .24rem;
+    }
+    .add {
+      color: #101010;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
   <body>
-    <div id="buttonDiv"></div>
-    <div>
-      <p>Choose a different background color!</p>
+    <div id="vue">
     </div>
   </body>
+  <script src="./lib/vue.min.js"></script>
+  <script src="./lib/mand.min.js"></script>
   <script src="./options.js"></script>
 </body>
 </html>

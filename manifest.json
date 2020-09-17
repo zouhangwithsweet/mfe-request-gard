@@ -8,7 +8,6 @@
     "storage",
     "webRequest",
     "webRequestBlocking",
-    "*://localhost:*/*",
     "*://manhattan.webapp.xiaojukeji.com/hebe/*",
     "*://manhattan.webapp.xiaojukeji.com/zeus/*",
     "*://manhattan.webapp.xiaojukeji.com/hera/*",
@@ -26,7 +25,6 @@
   "content_scripts": [
     {
       "matches": [
-        "*://localhost:*/*",
         "*://manhattan.webapp.xiaojukeji.com/hebe/*",
         "*://manhattan.webapp.xiaojukeji.com/zeus/*",
         "*://manhattan.webapp.xiaojukeji.com/hera/*"
@@ -35,16 +33,17 @@
     }
   ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "browser_action": {
-    "default_title": "say",
-    "default_icon": "images/batman.png",
+  "page_action": {
+    "default_title": "request",
+    "default_icon": "images/logo.png",
     "default_popup": "popup.html"
   },
+  "devtools_page": "dev.html",
   "icons": {
-    "16": "images/batman.png",
-    "32": "images/batman.png",
-    "48": "images/batman.png",
-    "128": "images/batman.png"
+    "16": "images/logo.png",
+    "32": "images/logo.png",
+    "48": "images/logo.png",
+    "128": "images/logo.png"
   },
   "manifest_version": 2
 }
