@@ -1,5 +1,5 @@
 {
-  "name": "golden-sentence",
+  "name": "mfe-request-gard",
   "version": "1.0.0",
   "description": "",
   "main": "background.js",
@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zouhangwithsweet/golden-sentence.git"
+    "url": "git+https://github.com/zouhangwithsweet/mfe-request-gard.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zouhangwithsweet/golden-sentence/issues"
+    "url": "https://github.com/zouhangwithsweet/mfe-request-gard/issues"
   },
-  "homepage": "https://github.com/zouhangwithsweet/golden-sentence#readme",
+  "homepage": "https://github.com/zouhangwithsweet/mfe-request-gard#readme",
   "dependencies": {
     "postcss": "^7.0.32",
     "postcss-pxtorem": "^5.1.1"
