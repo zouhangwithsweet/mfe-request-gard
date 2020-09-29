@@ -15,7 +15,8 @@
     "*://omgup.xiaojukeji.com/*",
     "*://omgup1.xiaojukeji.com/*",
     "*://omgup2.xiaojukeji.com/*",
-    "*://omgup3.xiaojukeji.com/*"
+    "*://omgup3.xiaojukeji.com/*",
+    "<all_urls>"
   ],
   "background": {
     "page": "page.html",
@@ -25,9 +26,7 @@
   "content_scripts": [
     {
       "matches": [
-        "*://manhattan.webapp.xiaojukeji.com/hebe/*",
-        "*://manhattan.webapp.xiaojukeji.com/zeus/*",
-        "*://manhattan.webapp.xiaojukeji.com/hera/*"
+        "<all_urls>"
       ],
       "js": ["content.js"]
     }

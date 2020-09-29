@@ -2,6 +2,8 @@ let ravenBlocking = false
 let omegaBlocking = false
 let apiBlocking = false
 
+let devtool = null
+
 const APIS = [
   'contract/reserveTemplate',
   'agreement/agreementAgree',
@@ -66,7 +68,14 @@ function checkIncludes(url, APIS) {
   return includes
 }
 
+function ravenHandler(details) {
+  devtool && devtool.postMessage(details)
+}
+
 function handlerRequest(details) {
+  if (checkIncludes(details.url, ['raven.xiaojukeji.com'])) {
+    ravenHandler(details)
+  }
   if (
     (checkIncludes(details.url, ['raven.xiaojukeji.com']) && ravenBlocking) ||
     (checkIncludes(details.url, ['omgup']) && omegaBlocking)
@@ -122,6 +131,7 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
         "*://omgup1.xiaojukeji.com/*",
         "*://omgup2.xiaojukeji.com/*",
         "*://omgup3.xiaojukeji.com/*",
+        "<all_urls>"
       ],
     },
     ["blocking", "requestBody", "extraHeaders"]
@@ -140,3 +150,32 @@ chrome.runtime.onInstalled.addListener(function(){
 		])
 	})
 })
+
+// raven
+
+const connections = {};
+chrome.runtime.onConnect.addListener(function (port) {
+    var extensionListener = function (message, sender, sendResponse) {
+        // The original connection event doesn't include the tab ID of the
+        // DevTools page, so we need to send it explicitly.
+        if (message.name == "init") {
+          connections[message.tabId] = port;
+          devtool = port
+          return;
+        }
+    // other message handling
+    }
+    // Listen to messages sent from the DevTools page
+    port.onMessage.addListener(extensionListener);
+    port.onDisconnect.addListener(function(port) {
+        port.onMessage.removeListener(extensionListener);
+        const tabs = Object.keys(connections);
+        for (var i=0, len=tabs.length; i < len; i++) {
+          if (connections[tabs[i]] == port) {
+            delete connections[tabs[i]]
+            devtool = null
+            break;
+          }
+        }
+    });
+});
