@@ -143,7 +143,7 @@ chrome.runtime.onInstalled.addListener(function(){
 		chrome.declarativeContent.onPageChanged.addRules([
 			{
 				conditions: [
-					new chrome.declarativeContent.PageStateMatcher({pageUrl: {urlContains: 'manhattan.webapp.xiaojukeji.com'}})
+					new chrome.declarativeContent.PageStateMatcher({pageUrl: {urlContains: 'http'}})
 				],
 				actions: [new chrome.declarativeContent.ShowPageAction()]
 			}

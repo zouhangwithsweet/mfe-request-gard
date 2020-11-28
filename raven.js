@@ -17,13 +17,30 @@ const compile = Vue.compile
 
 const tpl = `
   <div class="content">
-    <md-field title="Raven" brief="埋点详情">
-      <div class="action-container" slot="action" @click="clear">
-        <md-icon size="lg" name="refresh"></md-icon>
+    <md-field title="Raven" :brief="'埋点详情 / 共 ' + details.length +' 条'">
+      <div class="action-container" slot="action">
+        <md-input-item v-model="searchText" class="search-input" placeholder="输入埋点名称搜索">
+          <md-icon slot="right" size="md" name="search"  @click.native="searchClick"></md-icon>
+        </md-input-item>
+        <md-icon size="md" name="refresh"  @click.native="clear"></md-icon>
       </div>
       <hr style="border: 0; background-color: #eee; height: 1px;"/>
       <div
         v-for="(item, index) in details" :key="item.url"
+        v-show="!searchText || (
+          searchText &&
+          item.requestBody.formData &&
+          item.requestBody.formData.eid[0] &&
+          item.requestBody.formData.eid[0].includes(searchText)
+        )"
+        :class="{
+          'active-search': (
+            searchText &&
+            item.requestBody.formData &&
+            item.requestBody.formData.eid[0] &&
+            item.requestBody.formData.eid[0].includes(searchText)
+          )
+        }"
         style="
           margin-bottom: .48rem;
           border-bottom: 1px solid #ebebeb;
@@ -43,12 +60,19 @@ const tpl = `
             border-bottom: none;
           "
           :key="form + index"
-          v-for="(form, index) in ((item.requestBody.formData && Object.entries(item.requestBody.formData).filter(f => !ignoreKeys.includes(f[0]))) || [])"
+          v-for="(form, index) in (
+              (item.requestBody.formData &&
+                Object.entries(item.requestBody.formData)
+                  .filter(
+                    f => !ignoreKeys.includes(f[0])
+                  )
+              ) || []
+            )"
         >
           <p class="left"
             style="
               color: #41485d;
-              flex: 0 0 1rem;
+              flex: 0 0 2rem;
               align-self: stretch;
               text-align: center;
               position: relative;
@@ -66,7 +90,7 @@ const tpl = `
               text-align: center;
               align-items: center;
             ">
-              {{form[0]}}
+              {{keyMap[form[0]]}}({{form[0]}})
             </span>
           <p>
           <p class="right"
@@ -77,7 +101,7 @@ const tpl = `
               padding: 0 .32rem;
             "
           >
-            {{decode(form[1])}}
+            {{form[0] == 'pt' ? new Date(decode(form[1])).toLocaleString() : decode(form[1])}}
           <p>
         </div>
       <transition-group
@@ -96,13 +120,20 @@ var app = new Vue({
         'oid',
         'bid',
         'p',
-        'pt',
         'si',
         'sid',
         't',
         'v',
         'stid',
-      ]
+      ],
+      searchText: '',
+      keyMap: {
+        attrs: '贯穿属性',
+        eid: '埋点名称',
+        nm: '请求地址',
+        pt: '上报时间',
+        ext: '请求数据',
+      }
     }
   },
   mounted() {
@@ -120,7 +151,10 @@ var app = new Vue({
     },
     clear() {
       this.details = []
-    }
+    },
+    searchClick() {
+      console.log('搜索')
+    },
   },
   render: compile(tpl).render,
   staticRenderFns: compile(tpl).staticRenderFns
