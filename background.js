@@ -89,6 +89,12 @@ function ravenHandler(details) {
 
 // requesthandler
 function handlerRequest(details) {
+  if (checkLocalRequest(details.url) && mockApi && mock) {
+    return {
+      redirectUrl: mockApi + '/api' + details.url.split('/api')[1],
+    }
+  }
+
   if (checkIncludes(details.url, ['raven.xiaojukeji.com'])) {
     ravenHandler(details)
   }
