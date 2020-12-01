@@ -1,6 +1,8 @@
 let ravenBlocking = false
 let omegaBlocking = false
 let apiBlocking = false
+let mock = false
+let mockApi = ''
 
 let devtool = null
 
@@ -35,6 +37,7 @@ chrome.storage.sync.set({ MFE_API: APIS }, function () {
 })
 
 chrome.storage.onChanged.addListener(function (changes) {
+  console.log(changes)
   for (key in changes) {
     var storageChange = changes[key];
     if (key === 'ravenBlocking') {
@@ -45,6 +48,12 @@ chrome.storage.onChanged.addListener(function (changes) {
     }
     if (key === 'apiBlocking') {
       apiBlocking = storageChange.newValue
+    }
+    if (key === 'mock') {
+      mock = storageChange.newValue
+    }
+    if (key === 'mockApi') {
+      mockApi = storageChange.newValue
     }
   }
 })
@@ -68,10 +77,17 @@ function checkIncludes(url, APIS) {
   return includes
 }
 
+function checkLocalRequest(url) {
+  return /localhost:\d{4,}\/api\//g.test(url)
+    || /172.\d{2,}.\d{2,}.\d{2,}:\d{4,}\/api\//g.test(url)
+}
+
+// 往 Raven 发送 message
 function ravenHandler(details) {
   devtool && devtool.postMessage(details)
 }
 
+// requesthandler
 function handlerRequest(details) {
   if (checkIncludes(details.url, ['raven.xiaojukeji.com'])) {
     ravenHandler(details)
@@ -107,6 +123,21 @@ ${api.slice(api.indexOf("/api"))}
   }
 }
 
+// headerhandler
+function handlerSendHeadr(details) {
+  if (checkLocalRequest(details.url) && mockApi && mock) {
+    return {
+      requestHeaders: [
+        ...details.requestHeaders,
+        {
+          name: 'x-raven-mock',
+          value: mockApi,
+        }
+      ]
+    }
+  }
+}
+
 chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
   if (tab.url && tab.status === 'complete') {
     const dataR = await getStorage('ravenBlocking')
@@ -114,30 +145,46 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
 
     const dataO = await getStorage('omegaBlocking')
     omegaBlocking = dataO.omegaBlocking
+
+    const dataA = await getStorage('apiBlocking')
+    apiBlocking = dataA.apiBlocking
+
+    const dataM = await getStorage('mock')
+    mock = dataM.mock
+    const dataMapi = await getStorage('mockApi')
+    mockApi = dataMapi.mockApi
   }
 
-  if (chrome.webRequest.onBeforeRequest.hasListener(handlerRequest)) {
-    return
+  if (!chrome.webRequest.onBeforeRequest.hasListener(handlerRequest)) {
+    chrome.webRequest.onBeforeRequest.addListener(
+      handlerRequest,
+      {
+        urls: [
+          "*://manhattan.webapp.xiaojukeji.com/hebe/*",
+          "*://manhattan.webapp.xiaojukeji.com/zeus/*",
+          "*://manhattan.webapp.xiaojukeji.com/hera/*",
+          "*://raven.xiaojukeji.com/*",
+          "*://omgup.xiaojukeji.com/*",
+          "*://omgup1.xiaojukeji.com/*",
+          "*://omgup2.xiaojukeji.com/*",
+          "*://omgup3.xiaojukeji.com/*",
+          "<all_urls>"
+        ],
+      },
+      ["blocking", "requestBody", "extraHeaders"]
+    )
   }
-  chrome.webRequest.onBeforeRequest.addListener(
-    handlerRequest,
-    {
-      urls: [
-        "*://manhattan.webapp.xiaojukeji.com/hebe/*",
-        "*://manhattan.webapp.xiaojukeji.com/zeus/*",
-        "*://manhattan.webapp.xiaojukeji.com/hera/*",
-        "*://raven.xiaojukeji.com/*",
-        "*://omgup.xiaojukeji.com/*",
-        "*://omgup1.xiaojukeji.com/*",
-        "*://omgup2.xiaojukeji.com/*",
-        "*://omgup3.xiaojukeji.com/*",
-        "<all_urls>"
-      ],
-    },
-    ["blocking", "requestBody", "extraHeaders"]
-  )
+
+  if (!chrome.webRequest.onBeforeSendHeaders.hasListener(handlerSendHeadr)) {
+    chrome.webRequest.onBeforeSendHeaders.addListener(
+      handlerSendHeadr,
+      {urls: ["<all_urls>"]},
+      ['blocking', 'requestHeaders', 'extraHeaders'])
+  }
+  
 })
 
+// popup
 chrome.runtime.onInstalled.addListener(function(){
 	chrome.declarativeContent.onPageChanged.removeRules(undefined, function(){
 		chrome.declarativeContent.onPageChanged.addRules([
@@ -152,7 +199,6 @@ chrome.runtime.onInstalled.addListener(function(){
 })
 
 // raven
-
 const connections = {};
 chrome.runtime.onConnect.addListener(function (port) {
     var extensionListener = function (message, sender, sendResponse) {

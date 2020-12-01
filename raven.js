@@ -59,8 +59,8 @@ const tpl = `
             border: 1px solid #ebebeb;
             border-bottom: none;
           "
-          :key="form + index"
-          v-for="(form, index) in (
+          :key="form + m"
+          v-for="(form, m) in (
               (item.requestBody.formData &&
                 Object.entries(item.requestBody.formData)
                   .filter(
@@ -154,6 +154,10 @@ var app = new Vue({
     },
     searchClick() {
       console.log('搜索')
+    },
+    formater(el, data) {
+      const formatter = new JSONFormatter(data)
+      el.appendChild(formatter.render())
     },
   },
   render: compile(tpl).render,
