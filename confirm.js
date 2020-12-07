@@ -18,7 +18,7 @@ const tpl = `
         ref="input13"
         title="Mock 地址"
         placeholder="输入 mock 地址"
-        brief="例如：https://mock.xiaojukeji.com/mock/4869"
+        brief="例如：https://mock.xxx.com"
         is-highlight
       ></md-input-item>
       <md-cell-item title="是否请求 Mock">
@@ -34,6 +34,34 @@ const tpl = `
         <md-switch v-model="omegaBlocking" @input="saveHandler($event,'omegaBlocking')" slot="right" />
       </md-cell-item>
     </md-field>
+    <md-field
+      title="快速代理"
+    >
+      <div
+        class="action-container pointer"
+        slot="action"
+      >
+        +
+      </div>
+      <md-input-item
+        v-model="proxyOrigin"
+        @input="saveHandler($event,'proxyOrigin')"
+        ref="input13"
+        title="源地址"
+        placeholder="输入需要代理的地址"
+        brief="例如：https://mock.xxx.com"
+        is-highlight
+      ></md-input-item>
+      <md-input-item
+        v-model="proxyTarget"
+        @input="saveHandler($event,'proxyTarget')"
+        ref="input13"
+        title="目标地址"
+        placeholder="输入目标地址"
+        brief="例如：192.168.1.1"
+        is-highlight
+      ></md-input-item>
+    </md-field>
   </div>
 `
 
@@ -45,7 +73,9 @@ var app = new Vue({
       apiBlocking: true,
       mock: false,
       mockApi: '',
-      mockPrefix: 'https://mock.xiaojukeji.com',
+      // 代理
+      proxyOrigin: '',
+      proxyTarget: '',
     }
   },
   methods: {
@@ -69,6 +99,12 @@ var app = new Vue({
     })
     storage.get('mockApi', (data) => {
       this.mockApi = data.mockApi || 'https://mock.xiaojukeji.com'
+    })
+    storage.get('proxyOrigin', (data) => {
+      this.proxyOrigin = data.proxyOrigin || ''
+    })
+    storage.get('proxyTarget', (data) => {
+      this.proxyTarget = data.proxyTarget || ''
     })
   },
   methods: {

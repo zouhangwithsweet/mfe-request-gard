@@ -3,6 +3,8 @@ let omegaBlocking = false
 let apiBlocking = false
 let mock = false
 let mockApi = ''
+let proxyOrigin = ''
+let proxyTarget = ''
 
 let devtool = null
 
@@ -55,6 +57,12 @@ chrome.storage.onChanged.addListener(function (changes) {
     if (key === 'mockApi') {
       mockApi = storageChange.newValue
     }
+    if (key === 'proxyOrigin') {
+      proxyOrigin = storageChange.newValue
+    }
+    if (key === 'proxyTarget') {
+      proxyTarget = storageChange.newValue
+    }
   }
 })
 
@@ -89,6 +97,12 @@ function ravenHandler(details) {
 
 // requesthandler
 function handlerRequest(details) {
+  console.log(proxyTarget, proxyOrigin, details)
+  if (proxyTarget && proxyOrigin && checkIncludes(details.url, [proxyOrigin])) {
+    return {
+      redirectUrl: details.url.replace(proxyOrigin, proxyTarget)
+    }
+  }
   if (checkLocalRequest(details.url) && mockApi && mock) {
     return {
       redirectUrl: mockApi + '/api' + details.url.split('/api')[1],
@@ -148,17 +162,17 @@ chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
   if (tab.url && tab.status === 'complete') {
     const dataR = await getStorage('ravenBlocking')
     ravenBlocking = dataR.ravenBlocking
-
     const dataO = await getStorage('omegaBlocking')
     omegaBlocking = dataO.omegaBlocking
-
     const dataA = await getStorage('apiBlocking')
     apiBlocking = dataA.apiBlocking
-
     const dataM = await getStorage('mock')
     mock = dataM.mock
     const dataMapi = await getStorage('mockApi')
     mockApi = dataMapi.mockApi
+
+    proxyOrigin = (await getStorage('proxyOrigin')).proxyOrigin
+    proxyTarget = (await getStorage('proxyTarget')).proxyTarget
   }
 
   if (!chrome.webRequest.onBeforeRequest.hasListener(handlerRequest)) {
