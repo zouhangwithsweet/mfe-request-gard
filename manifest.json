@@ -1,6 +1,6 @@
 {
   "name": "Bad Request",
-  "version": "0.3",
+  "version": "0.3.1",
   "description": "Bad Request",
   "permissions": [
     "activeTab",
