@@ -48,10 +48,10 @@ const tpl = `
       >
       <transition-group name="flip-list">
         <div
-          class="event-content"
+          class="event-content animate__lightSpeedInLeft"
           style="
-            font-size: .28rem;
-            font-weight: bold;
+            font-size: .26rem;
+            font-weight: normal;
             display: flex;
             justify-content: space-between;
             align-items: center;
