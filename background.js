@@ -1,3 +1,4 @@
+// @ts-nocheck
 let ravenBlocking = false
 let omegaBlocking = false
 let apiBlocking = false
@@ -97,7 +98,6 @@ function ravenHandler(details) {
 
 // requesthandler
 function handlerRequest(details) {
-  console.log(proxyTarget, proxyOrigin, details)
   if (proxyTarget && proxyOrigin && checkIncludes(details.url, [proxyOrigin])) {
     return {
       redirectUrl: details.url.replace(proxyOrigin, proxyTarget)

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 const content = document.querySelector('#content')
 const backgroundPageConnection = chrome.runtime.connect({
@@ -29,20 +30,21 @@ const tpl = `
         v-for="(item, index) in details" :key="item.url"
         v-show="!searchText || (
           searchText &&
-          item.requestBody.formData &&
-          item.requestBody.formData.eid[0] &&
-          item.requestBody.formData.eid[0].includes(searchText)
+          item.formData &&
+          item.formData.eid[0] &&
+          item.formData.eid[0].includes(searchText)
         )"
+        class="detail-item"
         :class="{
           'active-search': (
             searchText &&
-            item.requestBody.formData &&
-            item.requestBody.formData.eid[0] &&
-            item.requestBody.formData.eid[0].includes(searchText)
+            item.formData &&
+            item.formData.eid[0] &&
+            item.formData.eid[0].includes(searchText)
           )
         }"
         style="
-          margin-bottom: .48rem;
+          margin-bottom: .32rem;
           border-bottom: 1px solid #ebebeb;
         "
       >
@@ -61,8 +63,8 @@ const tpl = `
           "
           :key="form + m"
           v-for="(form, m) in (
-              (item.requestBody.formData &&
-                Object.entries(item.requestBody.formData)
+              (item.formData &&
+                Object.entries(item.formData)
                   .filter(
                     f => !ignoreKeys.includes(f[0])
                   )
@@ -138,7 +140,29 @@ var app = new Vue({
   },
   mounted() {
     backgroundPageConnection.onMessage.addListener((message) => {
-      this.details.unshift(message)
+      if (!message.requestBody.formData.pld) {
+        const data = {
+          url: message.url,
+          formData: message.requestBody.formData,
+        }
+        this.details.unshift(data)
+      } else {
+        const formData = message.requestBody.formData.pld
+        const url = message.url
+        this.details.push(...formData.map((f, index) => {
+          let obj = {
+            url: url + '' + index,
+            formData: {}
+          }
+          const str = decodeURIComponent(decodeURIComponent(f))
+          str.split('&').forEach(st => {
+            obj.formData[st.split('=')[0]] = [
+              st.split('=')[1]
+            ]
+          })
+          return obj
+        }).reverse())
+      }
     })
   },
   methods: {
@@ -154,10 +178,6 @@ var app = new Vue({
     },
     searchClick() {
       console.log('搜索')
-    },
-    formater(el, data) {
-      const formatter = new JSONFormatter(data)
-      el.appendChild(formatter.render())
     },
   },
   render: compile(tpl).render,
