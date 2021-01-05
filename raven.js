@@ -44,69 +44,75 @@ const tpl = `
           )
         }"
         style="
-          margin-bottom: .32rem;
+          margin-bottom: .24rem;
           border-bottom: 1px solid #ebebeb;
         "
       >
-      <transition-group name="flip-list">
-        <div
-          class="event-content animate__lightSpeedInLeft"
-          style="
-            font-size: .26rem;
-            font-weight: normal;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            min-height: .9rem;
-            border: 1px solid #ebebeb;
-            border-bottom: none;
-          "
-          :key="form + m"
-          v-for="(form, m) in (
-              (item.formData &&
-                Object.entries(item.formData)
-                  .filter(
-                    f => !ignoreKeys.includes(f[0])
-                  )
-              ) || []
-            )"
-        >
-          <p class="left"
+        <transition-group name="flip-list">
+          <div
+            class="event-content animate__lightSpeedInLeft"
             style="
-              color: #41485d;
-              flex: 0 0 2rem;
-              align-self: stretch;
-              text-align: center;
-              position: relative;
-              border-right: 1px solid #ebebeb;
-            "
-          >
-            <span style="
-              position: absolute;
-              top: 0;
-              bottom: 0;
-              right: 0;
-              left: 0;
+              font-size: .24rem;
+              font-weight: normal;
               display: flex;
-              justify-content: center;
-              text-align: center;
+              justify-content: space-between;
               align-items: center;
-            ">
-              {{keyMap[form[0]]}}({{form[0]}})
-            </span>
-          <p>
-          <p class="right"
-            style="
-              color: #858b9c;
-              word-break:break-all;
-              flex: 1;
-              padding: 0 .32rem;
+              min-height: .8rem;
+              border: .01rem solid #ebebeb;
+              border-bottom: none;
             "
+            :key="form + m"
+            v-for="(form, m) in (
+                (item.formData &&
+                  Object.entries(item.formData)
+                    .filter(
+                      f => !ignoreKeys.includes(f[0])
+                    ).sort((a, b) => {
+                      if(a[0] === 'eid') {return -1} return 0
+                    })
+                ) || []
+              )"
+            :style="form[0] === 'eid' ? {
+              background: colorMap[form[1]] || '#e2e2df'
+            }: {}"
           >
-            {{form[0] == 'pt' ? new Date(decode(form[1])).toLocaleString() : decode(form[1])}}
-          <p>
-        </div>
-      <transition-group
+            <p class="left"
+              style="
+                color: #41485d;
+                flex: 0 0 2rem;
+                align-self: stretch;
+                text-align: center;
+                position: relative;
+                border-right: .01rem solid #ebebeb;
+              "
+            >
+              <span style="
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                align-items: center;
+              ">
+                {{keyMap[form[0]]}}({{form[0]}})
+              </span>
+            <p>
+            <p
+              class="right"
+              style="
+                color: #101010;
+                word-break:break-all;
+                flex: 1;
+                padding: 0 .32rem;
+              "
+            >
+              {{form[0] == 'pt' ? new Date(decode(form[1])).toLocaleString() : decode(form[1])}}
+            <p>
+          </div>
+        </transition-group>
       </div>
     </md-field>
   </div>
@@ -135,7 +141,14 @@ var app = new Vue({
         nm: '请求地址',
         pt: '上报时间',
         ext: '请求数据',
-      }
+      },
+      colorMap: {
+        error: '#fec5bb',
+        _global_e: '#f8edeb',
+        _timing: '#e8e8e4',
+        _r: '#d8e2dc',
+        _page_view: '#ece4db',
+      },
     }
   },
   mounted() {
@@ -149,7 +162,7 @@ var app = new Vue({
       } else {
         const formData = message.requestBody.formData.pld
         const url = message.url
-        this.details.push(...formData.map((f, index) => {
+        formData.map((f, index) => {
           let obj = {
             url: url + '' + index,
             formData: {}
@@ -157,11 +170,11 @@ var app = new Vue({
           const str = decodeURIComponent(decodeURIComponent(f))
           str.split('&').forEach(st => {
             obj.formData[st.split('=')[0]] = [
-              st.split('=')[1]
+              st.split('=').slice(1).join('')
             ]
           })
-          return obj
-        }).reverse())
+          this.details.unshift(obj)
+        })
       }
     })
   },
